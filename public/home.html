@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            background-color: #3d89fb;
+            padding: 1rem;
+            color: white;
+        }
+
+        nav .nav-left {
+            display: flex;
+            align-items: center;
+        }
+
+        nav .nav-left h1 {
+            margin: 0;
+            margin-left: 30rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        nav .nav-left a {
+            color: white;
+            font-size: 1.2rem;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            background-color: #680f4d;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav .nav-left a:hover {
+            background-color: #045682;
+        }
+
+        .container {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            max-width: 1400px;
+        }
+
+        h2 {
+            margin-bottom: 1.5rem;
+            color: #00796b;
+            font-size: 1.75rem;
+            border-bottom: 2px solid #004d40;
+            padding-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background-color: #004d40;
+            color: white;
+            font-weight: bold;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        #studentForm .form-control {
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+        }
+
+        #studentForm .btn-success {
+            background-color: #00796b;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            transition: background-color 0.3s;
+        }
+
+        #studentForm .btn-success:hover {
+            background-color: #004d40;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        footer {
+            background-color: #3d89fb;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            width: 100%;
+            bottom: 0;
+            left: 0;
+            font-size: 1.1rem;
+        }
+
+        .content-wrapper {
+            min-height: calc(100vh - 100px);
+        }
+
+        #successAlert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1050;
+            background-color: #add8e6;
+            color: #000;
+            padding: 1.5rem 2rem;
+            font-size: 1.25rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            display: none;
+            width: 60%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .title {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="header d-flex justify-content-between align-items-center">
+            <a href="services.html" class="btn btn-dark">Go to Our Services</a>
+            <h1 class="title">Student Management</h1>
+            <a href="index.html" class="btn btn-dark">Back to Home</a>
+        </div>
+    </nav>
+
+    <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span id="successMessage">Action completed successfully!</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="container mt-4">
+            <header><h2>Manage Students</h2></header>
+            <h3 class="mb-4">Filter Students</h3>
+
+            <form id="filterForm" class="mb-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        <select id="filterCategory" name="filterCategory" class="form-select">
+                            <option value="SID">SID</option>
+                            <option value="FirstName">First Name</option>
+                            <option value="LastName">Last Name</option>
+                            <option value="Email">Email</option>
+                            <option value="City">Nearest City</option>
+                            <option value="Guardian">Guardian</option>
+                            <option value="Course">Course</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" id="filterValue" name="filterValue" class="form-control" placeholder="Enter value to search" required>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">Search</button>
+                        <button type="button" id="clearFilter" class="btn btn-secondary">Clear Filter</button>
+                    </div>
+                </div>
+            </form>
+
+            <table class="table table-bordered table-striped" id="studentTable">
+                <thead>
+                    <tr>
+                        <th>SID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Nearest City</th>
+                        <th>Course</th>
+                        <th>Guardian</th>
+                        <th>Subject</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+
+            <h2>Add / Edit Student</h2>
+            <form id="studentForm">
+                <div class="mb-3" id="sidField">
+                    <input type="text" id="SID" name="SID" class="form-control" placeholder="SID" required>
+                </div>
+                <div class="mb-3">
+                    <input type="text" id="FirstName" name="FirstName" class="form-control" placeholder="First Name" required>
+                </div>
+                <div class="mb-3">
+                    <input type="text" id="LastName" name="LastName" class="form-control" placeholder="Last Name" required>
+                </div>
+                <div class="mb-3">
+                    <input type="email" id="Email" name="Email" class="form-control" placeholder="Email" required>
+                </div>
+                <div class="mb-3">
+                    <input type="text" id="City" name="City" class="form-control" placeholder="City" required>
+                </div>
+                <div class="mb-3">
+                    <select id="Course" name="Course" class="form-select" required>
+                        <option value="">Select Course</option>
+                        <option value="Foundation">Foundation</option>
+                        <option value="HND">HND</option>
+                        <option value="Degree">Degree</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label>Subjects:</label><br>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="Subject[]" value="ETF" id="subjectETF">
+                        <label class="form-check-label" for="subjectETF">ETF</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="Subject[]" value="ORDBMS" id="subjectORDBMS">
+                        <label class="form-check-label" for="subjectORDBMS">ORDBMS</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="Subject[]" value="OOP" id="subjectOOP">
+                        <label class="form-check-label" for="subjectOOP">OOP</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="Subject[]" value="SE" id="subjectSE">
+                        <label class="form-check-label" for="subjectSE">SE</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="Subject[]" value="HCL" id="subjectHCL">
+                        <label class="form-check-label" for="subjectHCL">HCL</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="Subject[]" value="IP" id="subjectIP">
+                        <label class="form-check-label" for="subjectIP">IP</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <input type="text" id="Guardian" name="Guardian" class="form-control" placeholder="Guardian" required>
+                </div>
+                <button type="submit" class="btn btn-success">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2024 Student Record Management System. All Rights Reserved.
+    </footer>
+
+    <script>
+        $(document).ready(function () {
+            loadStudents();
+
+            function loadStudents(category = '', value = '') {
+                $.ajax({
+                    url: '/students',
+                    type: 'GET',
+                    data: { category: category, value: value },
+                    success: function (students) {
+                        let rows = '';
+                        if (students.length > 0) {
+                            students.forEach(function (student) {
+                                rows += `
+                                    <tr>
+                                        <td>${student.SID}</td>
+                                        <td>${student.FirstName}</td>
+                                        <td>${student.LastName}</td>
+                                        <td>${student.Email}</td>
+                                        <td>${student.City}</td>
+                                        <td>${student.Course}</td>
+                                        <td>${student.Guardian}</td>
+                                        <td>${student.Subject.join(', ')}</td>
+                                        <td>
+                                            <button class="btn btn-warning btn-sm edit-btn" data-sid="${student.SID}">Edit</button>
+                                            <button class="btn btn-danger btn-sm delete-btn" data-sid="${student.SID}">Delete</button>
+                                        </td>
+                                    </tr>`;
+                            });
+                        } else {
+                            rows = '<tr><td colspan="9" class="text-center">No students found.</td></tr>';
+                        }
+                        $('#studentTable tbody').html(rows);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Failed to load students:', error);
+                        $('#studentTable tbody').html('<tr><td colspan="9" class="text-center text-danger">Failed to load students.</td></tr>');
+                    }
+                });
+            }
+
+            $('#studentForm').on('submit', function (e) {
+                e.preventDefault();
+
+                let action = $('#SID').is(':visible') ? 'add' : 'edit';
+                let url = action === 'edit' ? `/student/${$('#SID').val()}` : '/student';
+                let method = action === 'edit' ? 'PUT' : 'POST';
+
+                let selectedSubjects = [];
+                $('input[name="Subject[]"]:checked').each(function() {
+                    selectedSubjects.push($(this).val());
+                });
+
+                let studentData = {
+                    SID: $('#SID').val(),
+                    FirstName: $('#FirstName').val(),
+                    LastName: $('#LastName').val(),
+                    Email: $('#Email').val(),
+                    City: $('#City').val(),
+                    Course: $('#Course').val(),
+                    Guardian: $('#Guardian').val(),
+                    Subject: selectedSubjects
+                };
+
+                $.ajax({
+                    url: url,
+                    type: method,
+                    contentType: 'application/json',
+                    data: JSON.stringify(studentData),
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            showSuccessMessage(response.message);
+                            loadStudents();
+                            $('#studentForm')[0].reset();
+                            $('#SID').val('');
+                            $('#sidField').show();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Failed to submit the form:', error);
+                    }
+                });
+            });
+
+            $('#filterForm').on('submit', function (e) {
+                e.preventDefault();
+                loadStudents($('#filterCategory').val(), $('#filterValue').val());
+            });
+
+            $('#clearFilter').on('click', function () {
+                $('#filterForm')[0].reset();
+                loadStudents();
+            });
+
+            $(document).on('click', '.edit-btn', function () {
+                let sid = $(this).data('sid');
+                $.ajax({
+                    url: '/students',
+                    type: 'GET',
+                    success: function (students) {
+                        let student = students.find(student => student.SID == sid);
+                        $('#SID').val(student.SID).hide();
+                        $('#FirstName').val(student.FirstName);
+                        $('#LastName').val(student.LastName);
+                        $('#Email').val(student.Email);
+                        $('#City').val(student.City);
+                        $('#Course').val(student.Course);
+                        $('#Guardian').val(student.Guardian);
+
+                        $('input[name="Subject[]"]').prop('checked', false);
+
+                        student.Subject.forEach(function(subject) {
+                            $(`input[name="Subject[]"][value="${subject}"]`).prop('checked', true);
+                        });
+
+                        $('#sidField').hide();
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Failed to fetch students:', error);
+                    }
+                });
+            });
+
+            $(document).on('click', '.delete-btn', function () {
+                if (confirm('Are you sure you want to delete this student?')) {
+                    let sid = $(this).data('sid');
+                    $.ajax({
+                        url: `/student/${sid}`,
+                        type: 'DELETE',
+                        success: function (response) {
+                            if (response.status === 'success') {
+                                showSuccessMessage(response.message);
+                                loadStudents();
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Failed to delete student:', error);
+                        }
+                    });
+                }
+            });
+
+            function showSuccessMessage(message) {
+                $('#successMessage').text(message);
+                $('#successAlert').fadeIn();
+
+                setTimeout(function () {
+                    $('#successAlert').fadeOut();
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
